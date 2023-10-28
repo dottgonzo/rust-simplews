@@ -101,6 +101,8 @@ pub async fn initialize_private_tls(
     let mut cert_cursor = Cursor::new(private_chain_bytes);
     let cert_chain = certs(&mut cert_cursor)?;
 
+    print!("cert_chain: {:?}", cert_chain.as_slice());
+
     let mut root_cert_store = RootCertStore::empty();
 
     root_cert_store.add_parsable_certificates(cert_chain.as_slice());
