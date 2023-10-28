@@ -3,8 +3,8 @@ const https = require("https");
 const WebSocket = require("ws");
 
 // Carica i certificati
-const privateKey = fs.readFileSync("server.key", "utf8");
-const certificate = fs.readFileSync("server.crt", "utf8");
+const privateKey = fs.readFileSync("server_key.pem", "utf8");
+const certificate = fs.readFileSync("server_cert.pem", "utf8");
 const credentials = { key: privateKey, cert: certificate };
 
 const httpsServer = https.createServer(credentials, (req, res) => {

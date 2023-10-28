@@ -11,7 +11,7 @@ mod tests {
         let (ws_channel_sender, ws_channel_receiver) = crate::create_channel();
         let (_, events_channel_receiver) = crate::create_channel();
 
-        let my_cert_bytes = include_bytes!("nodeserver/server.crt");
+        let my_cert_bytes = include_bytes!("nodeserver/ca_cert.pem");
 
         let insecure_config = crate::Wsconfig {
             insecure: None,
