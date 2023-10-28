@@ -1,14 +1,12 @@
 [package]
 name = "simplews"
-version = "0.0.2"
+version = "0.0.1"
 edition = "2021"
 authors = ["Dario Caruso"]
 description = "simple crate to use websockets"
 license = "Apache-2.0"
 documentation = "https://docs.rs/simplews"
 
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 anyhow = "1.0.75"
@@ -19,7 +17,6 @@ rustls = { version = "0.21.8", features = [
     "secret_extraction",
 ] }
 tokio = { version = "1.33.0", features = ["macros","rt-multi-thread","time"] }
-
 tokio-tungstenite = { version = "0.20.1", features = [
     "rustls",
     "rustls-native-certs",
