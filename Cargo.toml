@@ -6,6 +6,7 @@ authors = ["Dario Caruso"]
 description = "simple crate to use websockets"
 license = "Apache-2.0"
 documentation = "https://docs.rs/simplews"
+repository = "https://github.com/dottgonzo/rust-simplews"
 
 
 [dependencies]
