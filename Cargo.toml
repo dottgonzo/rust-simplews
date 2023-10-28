@@ -1,6 +1,6 @@
 [package]
 name = "simplews"
-version = "0.0.4"
+version = "0.0.5"
 edition = "2021"
 authors = ["Dario Caruso"]
 description = "simple crate to use websockets"
