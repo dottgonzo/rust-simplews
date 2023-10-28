@@ -1,10 +1,8 @@
 #[cfg(test)]
 mod tests {
-    use std::env;
+    use std::io::Read;
 
     static WEBSOCKET_URI: &str = "wss://localhost:3000";
-
-    static PRIVATE_PEM_FILE_PATH: &str = "/src/tests/nodeserver/server.crt";
 
     #[tokio::test]
     async fn test_websocket_private_tls() {
@@ -13,12 +11,11 @@ mod tests {
         let (ws_channel_sender, ws_channel_receiver) = crate::create_channel();
         let (_, events_channel_receiver) = crate::create_channel();
 
+        let my_cert_bytes = include_bytes!("nodeserver/server.crt");
+
         let insecure_config = crate::Wsconfig {
-            insecure: false,
-            private_chain_file_path: Some(String::from(
-                env::current_dir().unwrap().to_str().unwrap().to_owned()
-                    + &PRIVATE_PEM_FILE_PATH.to_string(),
-            )),
+            insecure: None,
+            private_chain_bytes: Some(my_cert_bytes),
         };
 
         tokio::spawn(crate::start_websocket(
@@ -46,8 +43,8 @@ mod tests {
         let (_, events_channel_receiver) = crate::create_channel();
 
         let insecure_config = crate::Wsconfig {
-            insecure: true,
-            private_chain_file_path: None,
+            insecure: Some(true),
+            private_chain_bytes: None,
         };
 
         tokio::spawn(crate::start_websocket(
