@@ -553,6 +553,7 @@ dependencies = [
  "futures-util",
  "kanal",
  "rustls",
+ "rustls-pemfile",
  "tokio",
  "tokio-tungstenite",
  "url",

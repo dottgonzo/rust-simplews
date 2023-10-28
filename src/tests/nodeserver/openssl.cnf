@@ -1,0 +1,25 @@
+[req]
+distinguished_name = req_distinguished_name
+x509_extensions = v3_ca
+
+[req_distinguished_name]
+countryName = test
+countryName_default = TE
+stateOrProvinceName = test
+stateOrProvinceName_default = TE
+localityName = test
+localityName_default = test
+0.organizationName = test
+0.organizationName_default = test
+organizationalUnitName = test
+organizationalUnitName_default = test
+commonName = localhost
+commonName_max = 64
+emailAddress = test@example.com
+emailAddress_max = 64
+
+
+[v3_ca]
+basicConstraints = CA:TRUE
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid:always,issuer

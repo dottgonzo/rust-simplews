@@ -1,0 +1,12 @@
+{
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+  "rust-analyzer.linkedProjects": ["./Cargo.toml"],
+  "rust-analyzer.showUnlinkedFileNotification": false,
+  "rust-analyzer.check.command": "clippy",
+  "files.associations": {
+    "videodev2.h": "c",
+    "stdio.h": "c",
+    "fcntl.h": "c"
+  }
+}
