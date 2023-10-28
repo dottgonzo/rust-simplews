@@ -105,9 +105,9 @@ pub async fn initialize_private_tls(
     );
 
     // Leggi il certificato del client
-    let cert_file = File::open(private_chain_file_path).expect("Unable to open client_cert.pem");
+    let cert_file = File::open(private_chain_file_path)?;
     let mut cert_buf = BufReader::new(cert_file);
-    let cert_chain = certs(&mut cert_buf).expect("Failed to read client_cert.pem");
+    let cert_chain = certs(&mut cert_buf)?;
 
     //     // Leggi la chiave privata del client
     //     let key_file = File::open("client_key.pem").expect("Unable to open client_key.pem");
