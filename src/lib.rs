@@ -19,8 +19,8 @@ use url::Url;
 
 #[derive(Clone)]
 pub struct Wsconfig {
-    insecure: bool,
-    cert: Option<Certificate>
+    pub insecure: bool,
+    pub cert: Option<Certificate>
 }
 
 struct NoVerifier;

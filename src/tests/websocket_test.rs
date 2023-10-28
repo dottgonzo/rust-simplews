@@ -15,13 +15,12 @@ mod tests {
             cert: None,
         };
 
-        let optional_config = Some(insecure_config);
 
         tokio::spawn(crate::start_websocket(
             websocket_uri,
             events_channel_receiver.clone(),
             ws_channel_sender.clone(),
-            optional_config,
+            Some(insecure_config),
         ));
 
         while let Ok(msg) = ws_channel_receiver.recv().await {
