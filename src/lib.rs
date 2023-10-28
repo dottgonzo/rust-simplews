@@ -94,7 +94,7 @@ pub async fn initialize_private_tls(
     );
 
     let root_cert_store = RootCertStore::empty();
-    // let rust_cert = rustls::Certificate(include_bytes!("pina.movia.biz.pem").to_vec());
+    // let rust_cert = rustls::Certificate(include_bytes!("example.pem").to_vec());
     // root_cert_store.add(&rust_cert)?;
 
     // let mut tcp_stream = std::net::TcpStream::connect(&dev_config.websocket_url).unwrap();
