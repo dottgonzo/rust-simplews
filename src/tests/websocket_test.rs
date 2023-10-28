@@ -1,6 +1,5 @@
 #[cfg(test)]
 mod tests {
-    use std::io::Read;
 
     static WEBSOCKET_URI: &str = "wss://localhost:3000";
 
