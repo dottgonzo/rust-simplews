@@ -33,14 +33,14 @@ impl ServerCertVerifier for NoVerifier {
     }
 }
 pub async fn initialize_default_tls(
-    uri: String
+    url: Url
 ) -> anyhow::Result<(SplitSink<WebSocketStream<tokio_tungstenite::MaybeTlsStream<tokio::net::TcpStream>>, Message>, SplitStream<WebSocketStream<tokio_tungstenite::MaybeTlsStream<tokio::net::TcpStream>>>)> {
     println!(
         "Connecting to the WebSocket server at {}...",
-        &uri
+        &url.to_string()
     );
 
-    let (ws_stream, _) = tokio_tungstenite::connect_async(uri)
+    let (ws_stream, _) = tokio_tungstenite::connect_async(&url.to_string())
         .await?;
     println!("Successfully connected to the WebSocket server.");
 
@@ -49,11 +49,11 @@ pub async fn initialize_default_tls(
 }
 
 pub async fn initialize_insecure_tls(
-    uri: String
+    url: Url
 ) -> anyhow::Result<(SplitSink<WebSocketStream<tokio_tungstenite::MaybeTlsStream<tokio::net::TcpStream>>, Message>, SplitStream<WebSocketStream<tokio_tungstenite::MaybeTlsStream<tokio::net::TcpStream>>>)> {
     println!(
         "Connecting to the WebSocket server at {}...",
-        &uri
+        &url.to_string()
     );
 
     let root_cert_store = RootCertStore::empty();
@@ -69,8 +69,6 @@ pub async fn initialize_insecure_tls(
     let connector = Connector::Rustls(Arc::new(config));
 
 
-    // Connect to the web socket
-    let url = Url::parse(&uri.as_str())?;
 
     let (ws_stream, _) = connect_async_tls_with_config(url, None, true, Some(connector)).await?;
 
@@ -81,12 +79,12 @@ pub async fn initialize_insecure_tls(
 }
 
 pub async fn initialize_private_tls(
-    uri: String,
+    url: Url,
     _cert: Certificate
 ) -> anyhow::Result<(SplitSink<WebSocketStream<tokio_tungstenite::MaybeTlsStream<tokio::net::TcpStream>>, Message>, SplitStream<WebSocketStream<tokio_tungstenite::MaybeTlsStream<tokio::net::TcpStream>>>)> {
     println!(
         "Connecting to the WebSocket server at {}...",
-        &uri
+        &url.to_string()
     );
 
     let root_cert_store = RootCertStore::empty();
@@ -106,7 +104,7 @@ pub async fn initialize_private_tls(
 
 
     // Connect to the web socket
-    let url = Url::parse(&uri.as_str())?;
+    let url = Url::parse(&url.as_str())?;
 
     let (ws_stream, _) = connect_async_tls_with_config(url, None, true, Some(connector)).await?;
 
@@ -124,15 +122,15 @@ pub async fn initialize(
     let url = Url::parse(&uri.as_str())?;
 
     if url.scheme() == "ws" {
-        initialize_insecure_tls(uri).await
+        initialize_insecure_tls(url).await
     } else if insecure {
-        initialize_insecure_tls(uri).await
+        initialize_insecure_tls(url).await
 
     } else if cert.is_some() {
-        initialize_private_tls(uri,cert.unwrap()).await
+        initialize_private_tls(url,cert.unwrap()).await
 
     } else {
-        initialize_default_tls(uri).await
+        initialize_default_tls(url).await
     }
 
 
