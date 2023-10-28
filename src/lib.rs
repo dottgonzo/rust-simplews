@@ -86,25 +86,21 @@ pub async fn initialize_insecure_tls(
 
 pub async fn initialize_private_tls(
     url: Url,
-    _cert: Certificate
+    cert: Certificate
 ) -> anyhow::Result<(SplitSink<WebSocketStream<tokio_tungstenite::MaybeTlsStream<tokio::net::TcpStream>>, Message>, SplitStream<WebSocketStream<tokio_tungstenite::MaybeTlsStream<tokio::net::TcpStream>>>)> {
     println!(
         "Connecting to the WebSocket server at {}...",
         &url.to_string()
     );
 
-    let root_cert_store = RootCertStore::empty();
-    // let rust_cert = rustls::Certificate(include_bytes!("example.pem").to_vec());
-    // root_cert_store.add(&rust_cert)?;
+    let mut root_cert_store = RootCertStore::empty();
+    root_cert_store.add(&cert)?;
 
-    // let mut tcp_stream = std::net::TcpStream::connect(&dev_config.websocket_url).unwrap();
-    let mut config = rustls::ClientConfig::builder()
+    let config = rustls::ClientConfig::builder()
         .with_safe_defaults()
         .with_root_certificates(root_cert_store)
         .with_no_client_auth();
-    config
-        .dangerous()
-        .set_certificate_verifier(Arc::new(NoVerifier));
+
 
     let connector = Connector::Rustls(Arc::new(config));
 
