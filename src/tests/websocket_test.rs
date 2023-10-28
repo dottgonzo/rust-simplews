@@ -1,32 +1,36 @@
 #[cfg(test)]
 mod tests {
 
-static  WEBSOCKET_URI: &str = "wss://localhost:3000";
-
+    static WEBSOCKET_URI: &str = "wss://localhost:3000";
 
     #[tokio::test]
     async fn test_websocket_handler() {
-
         let websocket_uri = WEBSOCKET_URI.to_string();
-
 
         let (ws_channel_sender, ws_channel_receiver) = crate::create_channel();
         let (events_channel_sender, events_channel_receiver) = crate::create_channel();
 
+        let insecure_config = crate::Wsconfig {
+            insecure: true,
+            cert: None,
+        };
 
+        let optional_config = Some(insecure_config);
 
-        tokio::spawn(crate::start_websocket(websocket_uri, events_channel_receiver.clone(), ws_channel_sender.clone(), true,None));
-
+        tokio::spawn(crate::start_websocket(
+            websocket_uri,
+            events_channel_receiver.clone(),
+            ws_channel_sender.clone(),
+            optional_config,
+        ));
 
         while let Ok(msg) = ws_channel_receiver.recv().await {
             println!("get msg");
 
             println!("message_task_parsed: {:?}", msg);
-                if msg == "ping" {
-                    ws_channel_sender.send(msg).await.unwrap();
-                }
- 
+            if msg == "ping" {
+                ws_channel_sender.send(msg).await.unwrap();
+            }
         }
-
     }
 }

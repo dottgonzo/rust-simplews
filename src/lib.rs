@@ -17,6 +17,12 @@ use tokio_tungstenite::{connect_async_tls_with_config, Connector, WebSocketStrea
 use tokio_tungstenite::tungstenite::protocol::Message;
 use url::Url;
 
+#[derive(Clone)]
+pub struct Wsconfig {
+    insecure: bool,
+    cert: Option<Certificate>
+}
+
 struct NoVerifier;
 
 impl ServerCertVerifier for NoVerifier {
@@ -116,21 +122,26 @@ pub async fn initialize_private_tls(
 
 pub async fn initialize(
     uri: String,
-    insecure: bool,
-    cert: Option<Certificate>
+    ws_config: Option<Wsconfig>
 ) -> anyhow::Result<(SplitSink<WebSocketStream<tokio_tungstenite::MaybeTlsStream<tokio::net::TcpStream>>, Message>, SplitStream<WebSocketStream<tokio_tungstenite::MaybeTlsStream<tokio::net::TcpStream>>>)> {
     let url = Url::parse(&uri.as_str())?;
+    if ws_config.clone().is_some() {
+        let ws_cfg = ws_config.clone().unwrap();
+        if ws_cfg.insecure {
+            initialize_insecure_tls(url).await
 
-    if url.scheme() == "ws" {
-        initialize_insecure_tls(url).await
-    } else if insecure {
-        initialize_insecure_tls(url).await
+        } else if ws_cfg.cert.is_some() {
+            initialize_private_tls(url,ws_cfg.cert.unwrap()).await
 
-    } else if cert.is_some() {
-        initialize_private_tls(url,cert.unwrap()).await
-
+        } else {
+            initialize_default_tls(url).await
+        }
     } else {
-        initialize_default_tls(url).await
+        if url.scheme() == "ws" {
+            initialize_insecure_tls(url).await
+        } else {
+            initialize_default_tls(url).await
+        }
     }
 
 
@@ -139,12 +150,11 @@ pub async fn websocket_handler(
     uri: String,
     ws_channel_receiver: AsyncReceiver<String>,
     events_channel_sender: AsyncSender<String>,
-    insecure: bool,
-    cert: Option<Certificate>
+    ws_config: Option<Wsconfig>
 
 ) -> anyhow::Result<()> {
 
-    let (mut ws_sink, mut ws_stream) = initialize(uri,insecure,cert).await?;
+    let (mut ws_sink, mut ws_stream) = initialize(uri,ws_config).await?;
 
     let tx_loop = tokio::spawn(async move {
         while let Ok(msg) = ws_channel_receiver.recv().await {
@@ -181,14 +191,13 @@ pub async fn start_websocket(
     uri: String,
     ws_channel_receiver: AsyncReceiver<String>,
     events_channel_sender: AsyncSender<String>,
-    insecure: bool,
-    cert: Option<Certificate>
+    ws_config: Option<Wsconfig>
 ) -> anyhow::Result<()> {
     let timeout_in_seconds = 60;
     println!("start websocket routine");
 
     loop {
-        let t = websocket_handler(uri.clone(),ws_channel_receiver.clone(), events_channel_sender.clone(),insecure,cert.clone()).await;
+        let t = websocket_handler(uri.clone(),ws_channel_receiver.clone(), events_channel_sender.clone(),ws_config.clone()).await;
 
         if t.is_err() {
             let msg = format!("websocket error {:?}", t.unwrap_err());
