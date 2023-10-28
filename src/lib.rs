@@ -140,7 +140,7 @@ pub async fn initialize(
             initialize_default_tls(url).await
         }
     } else if url.scheme() == "ws" {
-        panic!("ws scheme is not supported, use wss instead")
+        Err(anyhow::anyhow!("ws scheme not supported, use secure wss"))
     } else {
         initialize_default_tls(url).await
     }
