@@ -17,13 +17,6 @@ use tokio_tungstenite::{connect_async_tls_with_config, Connector, WebSocketStrea
 use tokio_tungstenite::tungstenite::protocol::Message;
 use url::Url;
 
-#[derive(Debug, Clone)]
-pub struct PrivateCertChain {
-    pub ca: Option<String>,
-    pub cert: String,
-    pub key: String,
-}
-
 #[derive(Clone)]
 pub struct Wsconfig {
     pub insecure: bool,
@@ -100,8 +93,9 @@ pub async fn initialize_private_tls(
     SplitStream<WebSocketStream<tokio_tungstenite::MaybeTlsStream<tokio::net::TcpStream>>>,
 )> {
     println!(
-        "Connecting to the WebSocket server at {}...",
-        &url.to_string()
+        "Connecting to the WebSocket server at {} with cert file {}",
+        &url.to_string(),
+        &private_chain_file_path
     );
 
     // Leggi il certificato del client
