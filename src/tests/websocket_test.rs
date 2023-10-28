@@ -15,7 +15,7 @@ static  WEBSOCKET_URI: &str = "wss://localhost:3000";
 
 
 
-        tokio::spawn(crate::websocket_handler(websocket_uri, events_channel_receiver.clone(), ws_channel_sender.clone()));
+        tokio::spawn(crate::start_websocket(websocket_uri, events_channel_receiver.clone(), ws_channel_sender.clone(), true,None));
 
 
         while let Ok(msg) = ws_channel_receiver.recv().await {
