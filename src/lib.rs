@@ -82,14 +82,14 @@ pub async fn initialize_insecure_tls(
 
 pub async fn initialize_private_tls(
     uri: String,
-    cert: Certificate
+    _cert: Certificate
 ) -> anyhow::Result<(SplitSink<WebSocketStream<tokio_tungstenite::MaybeTlsStream<tokio::net::TcpStream>>, Message>, SplitStream<WebSocketStream<tokio_tungstenite::MaybeTlsStream<tokio::net::TcpStream>>>)> {
     println!(
         "Connecting to the WebSocket server at {}...",
         &uri
     );
 
-    let mut root_cert_store = RootCertStore::empty();
+    let root_cert_store = RootCertStore::empty();
     // let rust_cert = rustls::Certificate(include_bytes!("pina.movia.biz.pem").to_vec());
     // root_cert_store.add(&rust_cert)?;
 
