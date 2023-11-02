@@ -17,9 +17,9 @@ use tokio_tungstenite::tungstenite::protocol::Message;
 use url::Url;
 
 #[derive(Clone)]
-pub struct Wsconfig<'a> {
+pub struct Wsconfig {
     pub insecure: Option<bool>,
-    pub private_chain_bytes: Option<&'a [u8]>,
+    pub private_chain_bytes: Option<Vec<u8>>,
 }
 
 struct NoVerifier;
@@ -124,7 +124,7 @@ pub async fn initialize_private_tls(
 
 pub async fn initialize(
     uri: String,
-    ws_config: Option<Wsconfig<'static>>,
+    ws_config: Option<Wsconfig>,
 ) -> anyhow::Result<(
     SplitSink<WebSocketStream<tokio_tungstenite::MaybeTlsStream<tokio::net::TcpStream>>, Message>,
     SplitStream<WebSocketStream<tokio_tungstenite::MaybeTlsStream<tokio::net::TcpStream>>>,
@@ -135,7 +135,7 @@ pub async fn initialize(
         if ws_cfg.insecure.is_some() {
             initialize_insecure_tls(url).await
         } else if ws_cfg.private_chain_bytes.is_some() {
-            initialize_private_tls(url, ws_cfg.private_chain_bytes.unwrap()).await
+            initialize_private_tls(url, &ws_cfg.private_chain_bytes.unwrap()).await
         } else {
             initialize_default_tls(url).await
         }
@@ -149,7 +149,7 @@ pub async fn websocket_handler(
     uri: String,
     ws_channel_receiver: AsyncReceiver<String>,
     events_channel_sender: AsyncSender<String>,
-    ws_config: Option<Wsconfig<'static>>,
+    ws_config: Option<Wsconfig>,
 ) -> anyhow::Result<()> {
     let (mut ws_sink, mut ws_stream) = initialize(uri, ws_config).await?;
 
@@ -188,7 +188,7 @@ pub async fn start_websocket(
     uri: String,
     ws_channel_receiver: AsyncReceiver<String>,
     events_channel_sender: AsyncSender<String>,
-    ws_config: Option<Wsconfig<'static>>,
+    ws_config: Option<Wsconfig>,
 ) -> anyhow::Result<()> {
     let timeout_in_seconds = 60;
     println!("start websocket routine");

@@ -14,7 +14,7 @@ mod tests {
 
         let insecure_config = crate::Wsconfig {
             insecure: None,
-            private_chain_bytes: Some(my_cert_bytes),
+            private_chain_bytes: Some(my_cert_bytes.to_vec()),
         };
 
         tokio::spawn(crate::start_websocket(
