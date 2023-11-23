@@ -206,8 +206,11 @@ pub async fn start_websocket(
             let msg = format!("websocket error {:?}", t.unwrap_err());
             eprintln!("{}", msg);
         }
-        println!("websocket routine ended");
 
+        println!(
+            "restarting websocket routine in {} seconds",
+            timeout_in_seconds
+        );
         tokio::time::sleep(Duration::from_secs(timeout_in_seconds)).await;
     }
 }

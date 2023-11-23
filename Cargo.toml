@@ -10,20 +10,20 @@ repository = "https://github.com/dottgonzo/rust-simplews"
 
 
 [dependencies]
-anyhow = { version = "1.0.75" }
+anyhow = { version = "1.0.75", default-features = false, features = ["std"] }
 futures-util = { version = "0.3.29", default-features = false }
-kanal = { version = "0.1.0-pre8" }
+kanal = { version = "0.1.0-pre8", default-features = false, features = ["async"] }
 rustls = { version = "0.21.8", default-features = false, features = [
     "dangerous_configuration",
-    "secret_extraction",
 ] }
 rustls-pemfile =  { version = "1.0.3", default-features = false }
 tokio = { version = "1.33.0", default-features = false, features = ["macros","rt-multi-thread","time"] }
-tokio-tungstenite = { version = "0.20.1", features = [
+tokio-tungstenite = { version = "0.20.1", default-features = false, features = [
     "rustls",
     "rustls-native-certs",
     "rustls-tls-native-roots",
     "tokio-rustls",
     "webpki-roots",
+    "connect"
 ] }
 url = { version = "2.4.1", default-features = false }
