@@ -9,21 +9,27 @@ documentation = "https://docs.rs/simplews"
 repository = "https://github.com/dottgonzo/rust-simplews"
 
 
+[features]
+tls = ["dep:rustls","dep:rustls-pemfile","tokio-tungstenite/rustls","tokio-tungstenite/rustls-native-certs","tokio-tungstenite/rustls-tls-native-roots","tokio-tungstenite/tokio-rustls","tokio-tungstenite/webpki-roots"]
+no-tls = ["tokio-tungstenite/connect"]
+
+default = ["no-tls"]
+
 [dependencies]
 anyhow = { version = "1.0.75", default-features = false, features = ["std"] }
 futures-util = { version = "0.3.29", default-features = false }
 kanal = { version = "0.1.0-pre8", default-features = false, features = ["async"] }
 rustls = { version = "0.21.8", default-features = false, features = [
     "dangerous_configuration",
-] }
-rustls-pemfile =  { version = "1.0.3", default-features = false }
+], optional = true }
+rustls-pemfile =  { version = "1.0.3", default-features = false, optional = true }
 tokio = { version = "1.33.0", default-features = false, features = ["macros","rt-multi-thread","time"] }
-tokio-tungstenite = { version = "0.20.1", default-features = false, features = [
+tokio-tungstenite = { package= "tokio-tungstenite", version = "0.20.1", default-features = false, features = [
     "rustls",
     "rustls-native-certs",
     "rustls-tls-native-roots",
     "tokio-rustls",
     "webpki-roots",
     "connect"
-] }
+], optional = true }
 url = { version = "2.4.1", default-features = false }
