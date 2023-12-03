@@ -10,7 +10,7 @@ repository = "https://github.com/dottgonzo/rust-simplews"
 
 
 [features]
-tls = ["dep:rustls","dep:rustls-pemfile"]
+tls = ["dep:rustls","dep:rustls-pemfile","tokio-tungstenite/rustls","tokio-tungstenite/rustls-native-certs","tokio-tungstenite/rustls-tls-native-roots","tokio-tungstenite/tokio-rustls","tokio-tungstenite/webpki-roots"]
 
 default = ["tls"]
 
@@ -24,11 +24,6 @@ rustls = { version = "0.21.8", default-features = false, features = [
 rustls-pemfile =  { version = "1.0.3", default-features = false, optional = true }
 tokio = { version = "1.33.0", default-features = false, features = ["macros","rt-multi-thread","time"] }
 tokio-tungstenite = { version = "0.20.1", default-features = false, features = [
-    "rustls",
-    "rustls-native-certs",
-    "rustls-tls-native-roots",
-    "tokio-rustls",
-    "webpki-roots",
     "connect"
 ] }
 url = { version = "2.4.1", default-features = false }
