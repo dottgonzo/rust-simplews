@@ -6,9 +6,8 @@ use std::time::Duration;
 use futures_util::sink::SinkExt;
 use futures_util::stream::{SplitSink, SplitStream, StreamExt};
 use kanal::{AsyncReceiver, AsyncSender};
-// use rustls::client::{ServerCertVerified, ServerCertVerifier};
-// use rustls::RootCertStore;
-// use rustls_pemfile::certs;
+use rustls::pki_types::{CertificateDer, ServerName, UnixTime};
+
 use tokio_tungstenite::WebSocketStream;
 
 use tokio_tungstenite::tungstenite::protocol::Message;
@@ -20,22 +19,43 @@ pub struct Wsconfig {
     pub private_chain_bytes: Option<Vec<u8>>,
 }
 
+#[derive(Clone, Debug)]
 #[cfg(feature = "tls")]
-
 struct NoVerifier;
 #[cfg(feature = "tls")]
 
-impl rustls::client::ServerCertVerifier for NoVerifier {
+impl rustls::client::danger::ServerCertVerifier for NoVerifier {
     fn verify_server_cert(
         &self,
-        _end_entity: &rustls::Certificate,
-        _intermediates: &[rustls::Certificate],
-        _server_name: &rustls::ServerName,
-        _scts: &mut dyn Iterator<Item = &[u8]>,
+        _end_entity: &CertificateDer<'_>,
+        _intermediates: &[CertificateDer<'_>],
+        _server_name: &ServerName,
         _ocsp_response: &[u8],
-        _now: std::time::SystemTime,
-    ) -> Result<rustls::client::ServerCertVerified, rustls::Error> {
-        Ok(rustls::client::ServerCertVerified::assertion())
+        _now: UnixTime,
+    ) -> Result<rustls::client::danger::ServerCertVerified, rustls::Error> {
+        Ok(rustls::client::danger::ServerCertVerified::assertion())
+    }
+
+    fn verify_tls12_signature(
+        &self,
+        message: &[u8],
+        cert: &CertificateDer<'_>,
+        dss: &rustls::DigitallySignedStruct,
+    ) -> Result<rustls::client::danger::HandshakeSignatureValid, rustls::Error> {
+        Ok(rustls::client::danger::HandshakeSignatureValid::assertion())
+    }
+
+    fn verify_tls13_signature(
+        &self,
+        message: &[u8],
+        cert: &CertificateDer<'_>,
+        dss: &rustls::DigitallySignedStruct,
+    ) -> Result<rustls::client::danger::HandshakeSignatureValid, rustls::Error> {
+        Ok(rustls::client::danger::HandshakeSignatureValid::assertion())
+    }
+
+    fn supported_verify_schemes(&self) -> Vec<rustls::SignatureScheme> {
+        rustls::client::danger::ServerCertVerifier::supported_verify_schemes(self)
     }
 }
 pub async fn initialize_default_websocket_connection(
@@ -70,7 +90,6 @@ pub async fn initialize_insecure_tls(
     let root_cert_store = rustls::RootCertStore::empty();
 
     let mut config = rustls::ClientConfig::builder()
-        .with_safe_defaults()
         .with_root_certificates(root_cert_store)
         .with_no_client_auth();
     config
@@ -95,22 +114,24 @@ pub async fn initialize_private_tls(
     SplitSink<WebSocketStream<tokio_tungstenite::MaybeTlsStream<tokio::net::TcpStream>>, Message>,
     SplitStream<WebSocketStream<tokio_tungstenite::MaybeTlsStream<tokio::net::TcpStream>>>,
 )> {
+    use std::any;
+
     println!(
         "Connecting to the WebSocket server at {}...",
         &url.to_string()
     );
 
     let mut cert_cursor = std::io::Cursor::new(private_chain_bytes);
-    let cert_chain = rustls_pemfile::certs(&mut cert_cursor)?;
-
-    print!("cert_chain: {:?}", cert_chain.as_slice());
+    let cert_chain: Result<Vec<CertificateDer<'_>>, anyhow::Error> =
+        rustls_pemfile::certs(&mut cert_cursor)
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(|e| anyhow::anyhow!("Error parsing certificate: {:?}", e));
 
     let mut root_cert_store = rustls::RootCertStore::empty();
 
-    root_cert_store.add_parsable_certificates(cert_chain.as_slice());
+    root_cert_store.add_parsable_certificates(cert_chain?);
 
     let config = rustls::ClientConfig::builder()
-        .with_safe_defaults()
         .with_root_certificates(root_cert_store)
         .with_no_client_auth();
 
