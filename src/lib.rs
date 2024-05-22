@@ -114,8 +114,6 @@ pub async fn initialize_private_tls(
     SplitSink<WebSocketStream<tokio_tungstenite::MaybeTlsStream<tokio::net::TcpStream>>, Message>,
     SplitStream<WebSocketStream<tokio_tungstenite::MaybeTlsStream<tokio::net::TcpStream>>>,
 )> {
-    use std::any;
-
     println!(
         "Connecting to the WebSocket server at {}...",
         &url.to_string()
