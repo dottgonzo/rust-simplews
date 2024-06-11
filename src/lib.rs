@@ -6,7 +6,6 @@ use std::time::Duration;
 use futures_util::sink::SinkExt;
 use futures_util::stream::{SplitSink, SplitStream, StreamExt};
 use kanal::{AsyncReceiver, AsyncSender};
-use rustls::pki_types::{CertificateDer, ServerName, UnixTime};
 
 use tokio_tungstenite::WebSocketStream;
 
@@ -27,11 +26,11 @@ struct NoVerifier;
 impl rustls::client::danger::ServerCertVerifier for NoVerifier {
     fn verify_server_cert(
         &self,
-        _end_entity: &CertificateDer<'_>,
-        _intermediates: &[CertificateDer<'_>],
-        _server_name: &ServerName,
+        _end_entity: &rustls::pki_types::CertificateDer<'_>,
+        _intermediates: &[rustls::pki_types::CertificateDer<'_>],
+        _server_name: &rustls::pki_types::ServerName,
         _ocsp_response: &[u8],
-        _now: UnixTime,
+        _now: rustls::pki_types::UnixTime,
     ) -> Result<rustls::client::danger::ServerCertVerified, rustls::Error> {
         Ok(rustls::client::danger::ServerCertVerified::assertion())
     }
@@ -39,7 +38,7 @@ impl rustls::client::danger::ServerCertVerifier for NoVerifier {
     fn verify_tls12_signature(
         &self,
         _message: &[u8],
-        _cert: &CertificateDer<'_>,
+        _cert: &rustls::pki_types::CertificateDer<'_>,
         _dss: &rustls::DigitallySignedStruct,
     ) -> Result<rustls::client::danger::HandshakeSignatureValid, rustls::Error> {
         Ok(rustls::client::danger::HandshakeSignatureValid::assertion())
@@ -48,7 +47,7 @@ impl rustls::client::danger::ServerCertVerifier for NoVerifier {
     fn verify_tls13_signature(
         &self,
         _message: &[u8],
-        _cert: &CertificateDer<'_>,
+        _cert: &rustls::pki_types::CertificateDer<'_>,
         _dss: &rustls::DigitallySignedStruct,
     ) -> Result<rustls::client::danger::HandshakeSignatureValid, rustls::Error> {
         Ok(rustls::client::danger::HandshakeSignatureValid::assertion())
@@ -125,7 +124,7 @@ pub async fn initialize_private_tls(
     );
 
     let mut cert_cursor = std::io::Cursor::new(private_chain_bytes);
-    let cert_chain: Result<Vec<CertificateDer<'_>>, anyhow::Error> =
+    let cert_chain: Result<Vec<rustls::pki_types::CertificateDer<'_>>, anyhow::Error> =
         rustls_pemfile::certs(&mut cert_cursor)
             .collect::<Result<Vec<_>, _>>()
             .map_err(|e| anyhow::anyhow!("Error parsing certificate: {:?}", e));

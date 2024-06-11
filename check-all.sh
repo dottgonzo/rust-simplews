@@ -4,3 +4,6 @@ cargo check --target=x86_64-unknown-linux-gnu
 cargo check --target=x86_64-unknown-linux-musl
 cargo check --target=x86_64-pc-windows-gnu
 # cargo check --target=wasm32-wasi-preview1-threads
+# cargo check --release --target=wasm32-wasi-preview1-threads
+# cargo check --release --target=wasm32-wasi
+# cargo check --release --target=wasm32-unknown-unknown
