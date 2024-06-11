@@ -21,7 +21,7 @@ kanal = { version = "0.1.0-pre8", default-features = false, features = ["async"]
 rustls = { version = "0.23.7", default-features = false, features = ["std"], optional = true }
 rustls-pemfile =  { version = "2.1.1", default-features = false, optional = true }
 tokio = { version = "1.33.0", default-features = false, features = ["macros","rt-multi-thread","time"] }
-tokio-tungstenite = { version = "0.21.0", default-features = false, features = [
+tokio-tungstenite = { version = "0.22.0", default-features = false, features = [
     "connect"
 ] }
 url = { version = "2.4.1", default-features = false }
